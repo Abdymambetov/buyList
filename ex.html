@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Задание</title>
+    </head>
+    <body>
+        <script>
+            // const tasks = [
+            //     {id: 235,title:'Creat user registration UI',timeSpend:8,category:'Frontend',type:'task'},
+            //     {id: 238,title:'User sign-in via Google API',timeSpend:5,category:'Backend',type:'task'},
+            //     {id: 241,title:'Fix account linking',timeSpend:5,category:'Backend',type:'bug'},
+            // ]
+            // Задание: в массиве tasks должны быть объекты только с ключами title и category
+
+            const tasks = [
+                {id: 234,title:'Creat user registration API',timeSpend:4,category:'Backend',type:'task'},
+                {id: 235,title:'Creat user registration UI',timeSpend:8,category:'Frontend',type:'task'},
+                {id: 237,title:'User sign-in via Google UI',timeSpend:3.5,category:'Frontend',type:'task'},
+                {id: 238,title:'User sign-in via Google API',timeSpend:5,category:'Backend',type:'task'},
+                {id: 241,title:'Fix account linking',timeSpend:5,category:'Backend',type:'bug'},
+                {id: 250,title:'Fix wrong time created on new record',timeSpend:1,category:'Backend',type:'bug'},
+                {id: 262,title:'Fix sign-in failed message',timeSpend:2,category:'Frontend',type:'bug'}
+            ];
+
+            //frontend category tasks
+            const frontendTasks = tasks.filter(task => {
+                return task.category === 'Frontend';
+            })
+            let frontendFullTime = 0;
+            frontendTasks.map((task) => {
+                return frontendFullTime += task.timeSpend;
+            })
+
+            //backend category tasks
+            const backendTasks = tasks.filter(task => {
+                return task.category === 'Backend';
+            })
+
+            //tasks categories
+            const tasksCategories = {
+                frontend: frontendTasks.length,
+                backend: backendTasks.length
+            }
+
+            //bug type tasks
+            const bugTasks = tasks.filter(task => {
+                return task.type === 'bug';
+            })
+            let bugFullTime = 0;
+            bugTasks.map((task) => {
+                return bugFullTime += task.timeSpend;
+            })
+
+            //UI tasks
+            const tasksUI = tasks.filter(task => {
+                return task.title.includes('UI');
+            })
+
+            //(time span > 4) tasks
+            const tasksTime_4plus = tasks.filter(task => {
+                return task.timeSpend > 4;
+            })
+
+            console.log(
+                'Кол-во задач каждой категории в виде объекта: ' +
+                JSON.stringify(tasksCategories)
+            )
+            console.log(
+                'Задачи с затраченным временем больше 4 часов:\n' +
+                JSON.stringify(tasksTime_4plus)
+            )
+            alert(
+                'Общее кол-во времени задач категории Frontend: ' + frontendFullTime +
+                '\nОбщее кол-во задач типа bug: ' + bugFullTime +
+                '\nКол-во задач, имеющих в названии слово \"UI\": ' + tasksUI.length
+            )
+        </script>
+    </body>
+</html>

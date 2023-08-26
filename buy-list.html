@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Список покупок</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    </head>
+    <body class="bg-info">
+        <div class="container mt-4 h-auto bg-secondary border p-2" style="max-width: 650px;">
+            <div class="h1 text-center bg-light border border-dark py-1">Список покупок</div>
+            <div class="d-flex">
+                <input id="name" type="text" placeholder="Название" class="form-control border-dark rounded-1">
+                <div id="amount" class="h3 text-light mb-0 ms-2 d-flex align-items-center">
+                    x<span id="amountNumber">1</span>
+                    <div id="amountControl" class="h-100 d-flex flex-column" style="width: auto">
+                        <button type="button" id="up" class="text-center bg-light border border-dark rounded-1" style="line-height: 18px">˄</button>
+                        <button type="button" id="down" class="text-center bg-light border border-dark rounded-1 mt-1" style="line-height: 18px">˅</button>
+                    </div>
+                </div>
+                <input id="price" type="number" min="0" placeholder="Цена" class="form-control w-25 ms-2 border-dark rounded-1">
+                <span id="currency" class="h3 text-light mb-0 ms-1 d-flex align-items-center">KGS</span>
+                <button id="add-btn" type="button" class="btn btn-light ms-3 border border-dark rounded-1">+</button>
+            </div>
+            <strong id="error" class="m-0 text-light" style="text-decoration: underline;text-decoration-color: red;opacity: 0;transition: 50ms">error</strong>
+            <div class="contentWindow border bg-light border-3 border-dark rounded-1">
+                <div class="list-group px-3" style="overflow-y: auto;max-height: 600px"></div>
+                <hr class="m-0 border border-dark border-5">
+                <div id="totalPrice" class="w-100 text-center" style="padding-right: 1rem;font-size: 2.5rem;opacity: 0;">Итого:</div>
+            </div>
+        </div>
+        <script>
+            //header
+            const itemNameInput = document.querySelector('#name');
+            const itemPriceInput = document.querySelector('#price');
+            const currency = document.querySelector('#currency');
+            const itemAddBtn = document.querySelector('#add-btn');
+            const errorAlert = document.querySelector('#error');
+
+            //amount
+            const amount = document.querySelector('#amount');
+            const amountNumber = document.querySelector('#amountNumber');
+            const amountControl = document.querySelector('#amountControl');
+            const amountUp = document.querySelector('#up');
+            const amountDown = document.querySelector('#down');
+            const amountPlus = () => {
+                amountNumber.innerText++;
+            }
+            const amountMinus = () => {
+                if (+amountNumber.innerText === 1) return;
+                amountNumber.innerText--;
+            }
+            itemNameInput.addEventListener('keydown', (e) => {
+                if (e.keyCode === 38) amountPlus();
+                if (e.keyCode === 40) amountMinus();
+            })
+            amountUp.addEventListener('click',() => {
+                amountPlus();
+            })
+            amountDown.addEventListener('click',() => {
+                amountMinus();
+            })
+
+
+            //list
+            const contentWindow = document.querySelector('.window')
+            const listGroup = document.querySelector('.list-group');
+            const totalPrice = document.querySelector('#totalPrice');
+            let totalPriceCalculate = 0;
+            const totalResult = () => {
+                if (+totalPrice === 0) totalPrice.style.opacity = '0';
+                else totalPrice.style.opacity = '1';
+                totalPrice.innerText = totalPriceCalculate + ' ' + currency.innerText;
+            }
+
+            //error
+            const error = () => {
+                if (itemNameInput.value.trim() === '' || !itemPriceInput.value){
+                    errorAlert.innerText = 'Заполните все поля правильно!';
+                    return errorAlert.style.opacity = '1';
+                }
+                if (+itemPriceInput.value < 0){
+                    errorAlert.innerText = 'Введите корректную цену';
+                    return errorAlert.style.opacity = '1';
+                }
+                if (itemNameInput.value.length > 100 || itemPriceInput.value.length > 7){
+                    errorAlert.innerText = 'Слишком много символов';
+                    return errorAlert.style.opacity = '1';
+                }
+                errorAlert.style.opacity = '0';
+                add();
+            }
+            itemAddBtn.addEventListener('click', () => error());
+
+            //key Enter
+            const enterNext = (input,next,toDo = 0) => {
+                input.addEventListener('keydown', (e) => {
+                    if (e.keyCode !== 13) return;
+                    if (toDo === 0) next.focus();
+                    if (toDo === 1) error();
+                })
+            }
+            enterNext(itemNameInput,itemPriceInput);
+            enterNext(itemPriceInput,itemAddBtn,1);
+
+            //flex class
+            const flexClass = (object,alignItem = 'center',justifyContent = 'center') => {
+                const flexClass = ' d-flex ' + 'align-items-' + alignItem + ' justify-content-' + justifyContent;
+                return object.className += flexClass;
+            }
+
+            //add item
+            const add = (() => {
+                //item
+                const item = document.createElement('div');
+                item.className = 'border-bottom mt-3 pb-1';
+                flexClass(item,'center','between');
+
+                //item name
+                const itemName = document.createElement('span');
+                itemName.className = 'h2 m-0 w-75';
+                itemName.innerText = itemNameInput.value;
+
+                //item end
+                const itemEnd = document.createElement('div');
+                itemEnd.className = 'h4 m-0';
+                flexClass(itemEnd,'center','center');
+
+                //item amount
+                const itemAmount = document.createElement('span');
+                itemAmount.innerText = 'x' + amountNumber.innerText;
+                itemAmount.className = 'h2 mb-0 border-end border-dark';
+
+                //item price
+                const itemPriceValue = itemPriceInput.value * amountNumber.innerText;
+                const itemPrice = document.createElement('span');
+                itemPrice.className = 'text-center';
+                itemPrice.innerHTML = itemPriceValue + '<br>' + currency.innerText;
+                totalPriceCalculate += +itemPriceValue;
+
+                //delete button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.type = 'button';
+                deleteBtn.className = 'btn btn-danger ms-2 rounded-1';
+                flexClass(deleteBtn,'center','center');
+                deleteBtn.style.width = '30px';
+                deleteBtn.style.height = '30px';
+                deleteBtn.addEventListener('click',() => {
+                    const confirmation = confirm('Вы уверены?');
+                    if (!confirmation) return;
+                    totalPriceCalculate -= itemPriceValue;
+                    item.remove();
+                    totalResult();
+                })
+                const deleteBtnInner = document.createElement('symbol');
+                deleteBtnInner.innerText = '×';
+                deleteBtnInner.className = 'h2';
+                deleteBtnInner.style.fontSize = '40px';
+
+                //total
+                totalResult();
+
+                //append
+                deleteBtn.appendChild(deleteBtnInner);
+                itemEnd.append(itemPrice,deleteBtn);
+                item.append(itemName,itemAmount,itemEnd);
+                listGroup.prepend(item);
+
+
+                //final
+                itemNameInput.value = '';
+                itemPriceInput.value = '';
+                amountNumber.innerText = 1;
+                itemNameInput.focus();
+            })
+        </script>
+    </body>
+</html>
